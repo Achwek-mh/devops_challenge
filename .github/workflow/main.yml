@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository   # fetches the content of my repository and checks it out to the runner's workspace. When this step runs, it essentially clones my repository into the GitHub Actions runner environment, allowing next steps to have access to my project's files.
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+              terraform_version: 1.6.5
+
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Validate Terraform
+        run: terraform validate
+        env:
+          TF_ACTION_WORKING_DIR: './'
+
+      - name: Plan
+        run: terraform plan -out=tfplan
+        env:
+          TF_ACTION_WORKING_DIR: './'
+
+      - name: Apply
+        if: github.event_name == 'push' 
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_ACTION_WORKING_DIR: './'
+
+     
