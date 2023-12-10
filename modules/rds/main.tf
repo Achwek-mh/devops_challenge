@@ -1,7 +1,3 @@
-
-
-
-
 resource "aws_db_instance" "rds_instance"  {
   identifier            = "rds_instance"
   engine                = "postgres"

@@ -1,35 +1,28 @@
 provider "aws" {
   region = "us-east-1"
 }
-
 module "vpc" {
   source = "./modules/vpc"
-  vpc_cidr_block       = "10.0.0.0/16"
-  public_subnet_cidr   = "10.0.1.0/24"
-  private_subnet_cidr  = "10.0.2.0/24"
-  aws_region           = "us-east-1"
+  environment = var.environment
+  aws_region   = var.aws_region
 }
-
 module "rds" {
   source = "./modules/rds"
-  db_name      = "database"
-  db_username  = "admin"
-  db_password  = "admin"
-  aws_region   = "us-east-1"
+  environment = var.environment
+  db_name     = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
+  aws_region  = var.aws_region
   subnet_id1   = module.vpc.public_subnet_id
   subnet_id2   = module.vpc.private_subnet_id
 }
-
 module "appsync" {
   source = "./modules/appsync"
-   vpc_id = module.vpc.vpc_id
+  environment = var.environment
+  vpc_id = module.vpc.vpc_id
   rds_instance = module.rds.rds_instance
   appsync_sg = module.vpc.appsync_sg
 }
-
-
-
-
 
 #outputs 
 output "vpc_id" {

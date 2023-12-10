@@ -2,7 +2,6 @@
 resource "aws_appsync_api" "appsyncapi" {
   name                = "admin"
   authentication_type = "API_KEY"
-
   schema = <<EOF
     type List {
       id: ID!
