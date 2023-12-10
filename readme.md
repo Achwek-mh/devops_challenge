@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project builds a serverless API using AWS AppSync that interacts with a PostgreSQL database managed by Amazon RDS. The infrastructure is defined and provisioned using Terraform, organized into modular components for better maintainability.
+This project builds a serverless API using AWS AppSync that interacts with a PostgreSQL database managed by Amazon RDS. The infrastructure is defined and provisioned using Terraform, organized into modular components for better maintainability. It has also a CI/CD configured using Github actions.
 
 ## Components
 
@@ -25,6 +25,30 @@ This project builds a serverless API using AWS AppSync that interacts with a Pos
 - Defined a data source connected to the RDS PostgreSQL instance.
 - Setted up a GraphQL schema for data operations
 - Outputs the AppSync API URL.
+
+## CI/CD Pipeline
+
+The project includes a GitHub Actions workflow for CI/CD. The workflow is triggered on pushes to the `main` branch.
+
+### Workflow Steps
+
+1. **Checkout Repository:**
+   - Fetches the content of the repository and checks it out to the runner's workspace.
+
+2. **Set up Terraform:**
+   - Sets up Terraform in the GitHub Actions runner environment.
+
+3. **Initialize Terraform:**
+   - Initializes Terraform in the GitHub Actions runner environment.
+
+4. **Validate Terraform:**
+   - Validates the Terraform configuration for syntax and other errors.
+
+5. **Plan:**
+   - Generates an execution plan for Terraform changes.
+
+6. **Apply (On Push to `main`):**
+   - Applies Terraform changes automatically when a push event occurs on the `main` branch.
 
 ## Deployment Steps
 
