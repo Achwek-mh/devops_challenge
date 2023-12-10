@@ -55,7 +55,7 @@ resource "aws_iam_role" "appsync_role" {
 
 
 
-output "appsync_api_id" {
-  appsync_api_id = aws_appsync_api.appsync_api.id
-  appsync_api_url = aws_appsync_api.appsync_api.graphql_endpoint
+
+output "api_url" {
+  value = aws_appsync_api.my_appsync_api.uris[0]
 }

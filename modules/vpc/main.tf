@@ -1,22 +1,74 @@
 
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  name                 = "my-vpc"
-  cidr                 = "10.0.0.0/16"
-  azs                  = ["us-east-1a", "us-east-1b"]
-  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets       = ["10.0.3.0/24", "10.0.4.0/24"]
-  enable_nat_gateway   = true
-  enable_vpn_gateway   = false
-  single_nat_gateway   = true
-  public_subnet_tags   = { Name = "public" }
-  private_subnet_tags  = { Name = "private" }
-  create_database_subnet_group = true
-
-
-
-
+resource "aws_vpc" "vpc" {
+  cidr_block = var.vpc_cidr_block
+  enable_dns_support = true
+  enable_dns_hostnames = true
+  tags = {
+    Name = "VPC"
+  }
 }
 
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.public_subnet_cidr
+  availability_zone       = "us-east-1a" 
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "PublicSubnet"
+  }
+}
 
+resource "aws_subnet" "private_subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.private_subnet_cidr
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "PrivateSubnet"
+  }
+}
 
+resource "aws_internet_gateway" "my_igw" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_igw.id
+  }
+
+  associate_subnet = [aws_subnet.public_subnet.id]
+}
+
+resource "aws_nat_gateway" "my_nat_gateway" {
+  allocation_id = aws_eip.my_eip.id
+  subnet_id     = aws_subnet.public_subnet.id
+
+  depends_on = [aws_internet_gateway.my_igw]
+}
+
+resource "aws_eip" "my_eip" {
+  vpc = true
+}
+
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.my_nat_gateway.id
+  }
+
+  associate_subnet = [aws_subnet.private_subnet.id]
+}
+
+output "public_subnet_id" {
+  value = aws_subnet.public_subnet.id
+}
+
+output "private_subnet_id" {
+  value = aws_subnet.private_subnet.id
+}
