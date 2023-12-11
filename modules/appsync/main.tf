@@ -27,8 +27,8 @@ resource "aws_appsync_datasource" "rds" {
   relational_database_config {
     relational_database_source {
       region                = "us-east-1"
-      db_cluster_identifier = aws_db_instance.postgres.id
-      database_name         = aws_db_instance.postgres.name
+      db_cluster_identifier = aws_db_instance.rds_instance.id
+      database_name         = aws_db_instance.rds_instance.name
     }
   }
 }
@@ -56,5 +56,5 @@ resource "aws_iam_role" "appsync_role" {
 
 
 output "api_url" {
-  value = aws_appsync_api.my_appsync_api.uris[0]
+  value = aws_appsync_api.appsyncapi.uris[0]
 }
